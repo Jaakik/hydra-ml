@@ -1,7 +1,7 @@
 from typing import Optional, Tuple
 from .datasets.mouse_dataset import MouseDataset
 from pytorch_lightning import LightningDataModule
-from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
+from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision.transforms import transforms
 
 
