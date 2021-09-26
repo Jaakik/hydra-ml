@@ -3,6 +3,11 @@ import numpy as np
 
 
 class MouseDataset(Dataset):
+    """
+     Dataset for Caltech Mouse Social Interactions (CalMS21) Dataset.
+     download from :  https://data.caltech.edu/records/1991
+    """
+
     def __init__(self, data_path, ann_path=None):
         self.ann = np.load(ann_path, allow_pickle=True).item()
         self.data = np.load(data_path, allow_pickle=True).item()
