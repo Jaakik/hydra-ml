@@ -2,6 +2,7 @@ from torch.utils.data import Dataset
 import numpy as np
 
 
+
 class MouseDataset(Dataset):
     """
      Dataset for Caltech Mouse Social Interactions (CalMS21) Dataset.
