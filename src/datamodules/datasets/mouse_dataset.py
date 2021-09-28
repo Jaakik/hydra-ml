@@ -16,6 +16,9 @@ class MouseDataset(Dataset):
     def __len__(self):
         return len(self.data.keys())
 
+
+
+    #TODO return mask here
     def __getitem__(self, idx):
         seq_key = self.data.keys()[idx]
         if self.ann_path is not None:
