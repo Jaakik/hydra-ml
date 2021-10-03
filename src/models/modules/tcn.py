@@ -18,14 +18,14 @@ class MS_TCN2(nn.Module):
         [copy.deepcopy(Refinement(num_layers_R, num_f_maps, num_classes, num_classes)) for s in range(num_R)])
 
 
-def forward(self, x):
-    out = self.PG(x)
-    outputs = out.unsqueeze(0)
-    for R in self.Rs:
-        out = R(F.softmax(out, dim=1))
-        outputs = torch.cat((outputs, out.unsqueeze(0)), dim=0)
+    def forward(self, x):
+        out = self.PG(x)
+        outputs = out.unsqueeze(0)
+        for R in self.Rs:
+            out = R(F.softmax(out, dim=1))
+            outputs = torch.cat((outputs, out.unsqueeze(0)), dim=0)
 
-    return outputs
+        return outputs
 
 
 class Prediction_Generation(nn.Module):

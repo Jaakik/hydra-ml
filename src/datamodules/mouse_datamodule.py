@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader, Dataset, random_split
 from torchvision.transforms import transforms
 
 
-class MNISTDataModule(LightningDataModule):
+class MouseDataModule(LightningDataModule):
     """
     LightningDataModule for Caltech Mouse Social Interactions (CalMS21) Dataset.
 
@@ -25,9 +25,9 @@ class MNISTDataModule(LightningDataModule):
 
     def __init__(
             self,
-            data_train_dir: str = "data/mouse/train/train_features.npy",
-            data_test_dir: str = "data/mouse/train/train_features.npy",
-            ann_dir: str = "data/mouse/annotations/train.npy",
+            data_train_dir: str = "/Users/marouanejaakik/Desktop/git-explore/hydra-ml/data/mouse/train/train_features.npy",
+            data_test_dir: str = "/Users/marouanejaakik/Desktop/git-explore/hydra-ml/data/mouse/train/train_features.npy",
+            ann_dir: str = "/Users/marouanejaakik/Desktop/git-explore/hydra-ml/data/mouse/annotation /train.npy",
             train_val_split: Tuple[int, int] = (55, 15),
             batch_size: int = 4,
             num_workers: int = 0,
@@ -41,11 +41,6 @@ class MNISTDataModule(LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.pin_memory = pin_memory
-
-        self.transforms = transforms.Compose(
-            [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
-        )
-
         self.data_train: Optional[Dataset] = None
         self.data_val: Optional[Dataset] = None
         self.data_test: Optional[Dataset] = None
@@ -58,11 +53,10 @@ class MNISTDataModule(LightningDataModule):
         # add the script used to directly download the dataset from aicrowd platform
         pass
 
-
     def setup(self, stage: Optional[str] = None):
         self.data_test = MouseDataset(self.data_test_dir)
-        train_set = MouseDataset(self.data_train_dir,self.ann_dir)
-        self.data_train , self.data_val = random_split(train_set,self.train_val_split)
+        train_set = MouseDataset(self.data_train_dir, self.ann_dir)
+        self.data_train, self.data_val = random_split(train_set, self.train_val_split)
 
     def train_dataloader(self):
         return DataLoader(

@@ -10,7 +10,7 @@ from src.models.modules.tcn import MS_TCN2
 
 class MSTCNLitModel(LightningModule):
 
-    def __init__(self, num_layers_PG, num_layers_R, num_R, num_f_maps, dim, num_classes):
+    def __init__(self, num_layers_PG, num_layers_R, num_R, num_f_maps, dim, num_classes, lr):
         super().__init__()
 
         # model parameters
@@ -20,9 +20,12 @@ class MSTCNLitModel(LightningModule):
         self.num_f_maps = num_f_maps
         self.dim = dim
         self.num_classes = num_classes
+        self.lr = lr
 
         # model
         self.model = MS_TCN2(num_layers_PG, num_layers_R, num_R, num_f_maps, dim, num_classes)
+        self.model.float()
+
 
         # loss
 
@@ -42,29 +45,29 @@ class MSTCNLitModel(LightningModule):
         self.test_accuracy = Accuracy()
 
     def forward(self, x: torch.Tensor):
-        pass
+        return self.model(x.float())
 
     def step(self, batch: Any):
-        x, y, mask = batch
+        x,key, y = batch
         loss = 0
         logits = self.forward(x)
         for p in logits:
             loss += self.ce(p.transpose(2, 1).contiguous().view(-1, self.num_classes), y.view(-1))
             loss += 0.15 * torch.mean(
                 torch.clamp(self.mse(F.log_softmax(p[:, :, 1:], dim=1), F.log_softmax(p.detach()[:, :, :-1], dim=1)),
-                            min=0, max=16) * mask[:, :, 1:])
-        loss = self.criterion(logits, y)
-        preds = torch.argmax(logits, dim=1)
+                            min=0, max=16))
+
+        preds = torch.argmax(logits[-1].data, 1)
         return loss, preds, y
 
     def training_step(self, batch: Any, batch_idx: int):
         loss, preds, y = self.step(batch)
-        acc = self.train_accuracy(preds, y)
-        self.log("train/loss", loss, on_step=False, on_epoch=True, prog_bar=False)
-        self.log("train/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
 
+        acc = self.train_accuracy(preds, y)
+        self.log("train/loss", loss, on_step=True, on_epoch=True, prog_bar=False)
+        self.log("train/acc", acc, on_step=True, on_epoch=True, prog_bar=True)
 
 
     def configure_optimizers(self):
         return torch.optim.Adam(
-            params=self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay)
+            params=self.parameters(), lr=self.lr)
