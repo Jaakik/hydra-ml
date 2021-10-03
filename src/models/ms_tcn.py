@@ -58,8 +58,12 @@ class MSTCNLitModel(LightningModule):
         return loss, preds, y
 
     def training_step(self, batch: Any, batch_idx: int):
-        #todo computing metrics and logging
-        pass
+        loss, preds, y = self.step(batch)
+        acc = self.train_accuracy(preds, y)
+        self.log("train/loss", loss, on_step=False, on_epoch=True, prog_bar=False)
+        self.log("train/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
+
+
 
     def configure_optimizers(self):
         return torch.optim.Adam(
