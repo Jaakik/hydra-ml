@@ -10,8 +10,10 @@ class MouseDataset(Dataset):
     """
 
     def __init__(self, data_path, ann_path=None):
-        self.ann = np.load(ann_path, allow_pickle=True).item()
+        self.ann_path = ann_path
         self.data = np.load(data_path, allow_pickle=True).item()
+        if(ann_path is not None) :
+            self.ann = np.load(self.ann_path, allow_pickle=True).item()
 
     def __len__(self):
         return len(self.data.keys())
@@ -20,8 +22,8 @@ class MouseDataset(Dataset):
 
     #TODO return mask here
     def __getitem__(self, idx):
-        seq_key = self.data.keys()[idx]
+        seq_key = list(self.data.keys())[idx]
         if self.ann_path is not None:
-            return self.data.values()[idx], seq_key, self.ann['sequences'][seq_key]['anntations']
+            return self.data[seq_key].T, seq_key, self.ann['sequences'][seq_key]['annotations']
         else:
-            return self.data.values()[idx], seq_key
+            return self.data.values()[idx].T, seq_key

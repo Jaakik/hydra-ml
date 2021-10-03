@@ -1,0 +1,9 @@
+_target_: src.models.ms_tcn.MSTCNLitModel
+
+num_layers_PG: 4
+num_layers_R: 10
+num_R: 3
+num_f_maps: 32
+dim: 105
+num_classes: 4
+lr: 0.001
